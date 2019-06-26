@@ -1,23 +1,23 @@
 #include"pch.h"
-#include"BoardManager.h"
+#include"Board.h"
 
-bool BoardManager::ValidMoveAvailable() {
+bool Board::ValidMoveAvailable() const {
 	uint32_t counter = 0;
 	for (auto n : this->board)
 		counter += (n == defaultColor);
 	return (counter >= 2); //At least two cells are available
 }
 
-bool BoardManager::ValidateInput(CellPair cells) {
+bool Board::ValidateInput(CellPair cells) const {
 	return cells.first < board.size() && cells.second < board.size() //Cells chosen are on board
 		&& board[cells.first] == defaultColor && board[cells.second] == defaultColor //Cells are not taken already
 		&& cells.first != cells.second; //Diffrent cells are chosen
 }
-bool BoardManager::ValidateInput(CellPair cells, Cell choice) {
+bool Board::ValidateInput(CellPair cells, Cell choice) const {
 	return cells.first == choice || cells.second == choice;
 }
 
-bool BoardManager::WinState() {
+bool Board::WinState() const {
 	for(size_t gap = 1; gap <= ceil((float)board.size() / (goal - 1)) - 1; ++gap)
 		for (size_t i = 0; i < board.size() - (goal-1)*gap; i++) {
 			if (board[i] == defaultColor)
@@ -31,7 +31,7 @@ bool BoardManager::WinState() {
 		}
 	return false;
 }
-bool BoardManager::WinStateIf(Cell c, uint32_t col) {
+bool Board::WinStateIf(Cell c, uint32_t col) const {
 	for (size_t gap = 1; gap <= ceil((float)board.size() / (goal - 1)) - 1; ++gap)
 		for (size_t i = 0; i < board.size() - (goal - 1)*gap; i++) {
 			uint32_t firstColor = i == c ? col : board[i];
@@ -46,7 +46,7 @@ bool BoardManager::WinStateIf(Cell c, uint32_t col) {
 		}
 	return false;
 }
-bool BoardManager::ColorCell(Cell c) {
+bool Board::ColorCell(Cell c) {
 	if (c >= board.size() || c < 0 || board[c] != defaultColor)
 		return false;
 	board[c] = GetCurrentColor();
@@ -54,38 +54,38 @@ bool BoardManager::ColorCell(Cell c) {
 	return true;
 }
 
-uint32_t BoardManager::GetCurrentColor() {
+uint32_t Board::GetCurrentColor() const {
 	return Colors[currentPlayer];
 }
 
-uint32_t BoardManager::GetPlayer() {
+uint32_t Board::GetPlayer() const {
 	return currentPlayer;
 }
 
-uint32_t BoardManager::NextPlayer() {
+uint32_t Board::NextPlayer() const {
 	return (currentPlayer + 1) % Colors.size();
 }
-void BoardManager::SwitchPlayer() {
+void Board::SwitchPlayer() {
 	currentPlayer = (currentPlayer + 1) % Colors.size();
 }
-uint32_t BoardManager::GetNextColor() {
+uint32_t Board::GetNextColor() const {
 	return Colors[NextPlayer()];
 }
 
-Cell& BoardManager::operator[](int i) {
+Cell& Board::operator[](int i) {
 	return board[i];
 }
-size_t BoardManager::size() {
+size_t Board::size() const {
 	return board.size();
 }
 
-void BoardManager::clear() {
+void Board::clear() {
 	std::fill_n(board.begin(), board.size(), defaultColor);
 	currentPlayer = startingPlayer;
 	playCounter = 0;
 }
 
-std::vector<Cell> BoardManager::GetWinning() {
+std::vector<Cell> Board::GetWinning() const {
 	for (size_t gap = 1; gap <= ceil((float)board.size() / (goal - 1)) - 1; ++gap)
 		for (size_t i = 0; i < board.size() - (goal - 1)*gap; i++) {
 			if (board[i] == defaultColor)
@@ -103,4 +103,12 @@ std::vector<Cell> BoardManager::GetWinning() {
 			
 		}
 	return std::vector<Cell>();
+}
+
+std::vector<Cell> Board::GetFreeCells() const {
+	std::vector<Cell> freeCells;
+	for (size_t i = 0; i < size(); ++i)
+		if (board[i] == defaultColor)
+			freeCells.push_back(i);
+	return freeCells;
 }

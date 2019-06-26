@@ -2,19 +2,21 @@
 #include"pch.h"
 #include"AI.h"
 
+/*
+Player class is used as a wrapper for ChooseAI's and ColorAI's GetMove function. 
+*/
 class Player {
 public:
-	bool human = false;
 	std::string name;
 	struct {
-		ChooseAI* choose;
-		ColorAI* color;
+		std::shared_ptr<ChooseAI> choose;
+		std::shared_ptr<ColorAI> color;
 	} AI;
 
-	Cell		GetMove(CellPair, BoardManager&);
-	CellPair	GetMove(BoardManager&);
+	Cell		GetMove(CellPair, Board&);
+	CellPair	GetMove(Board&);
 	Player();
-	Player(ChooseAI*, ColorAI*);
+	Player(std::shared_ptr<ChooseAI>, std::shared_ptr<ColorAI>);
 
 };
 
